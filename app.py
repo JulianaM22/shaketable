@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify
-from shake_table.shake_table import ShakeTable
-from shake_table.trajectories import sine_wave
+from shake_table import ShakeTable
+from trajectories import sine_wave
 import threading
 
 app = Flask(__name__)

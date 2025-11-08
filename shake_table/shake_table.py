@@ -126,21 +126,6 @@ class ShakeTable():
                 self.motor.step_away()
             else:
                 self.motor.step_towards()
-            
-def sine_test(amplitude, frequency, duration, sampling_rate=10000):
-    '''
-    Creates sine wave and runs the trajectory on the shake table.
-
-    Args:
-        amplitude (int): Amplitude of sine wave. Value is num steps, NOT REAL WORLD UNITS
-        frequency (float): Frequency of sine wave.
-        duration (float): Length of sine wave in seconds
-    '''
-    time_points = np.linspace(0, duration, duration*sampling_rate, endpoint=False)
-    amplitude_points = amplitude * np.sin(2 * np.pi * frequency * time_points)
-    table = ShakeTable()
-    table.run_trajectory(time_points, amplitude_points)
-
 
 def test_table_features():
     """
@@ -179,9 +164,10 @@ if __name__ == '__main__':
 #    test_table_features()
     #Showing natural frequencies
     #sine_test(250, 7.18, 3)
-    sine_test(250, 6.11, 3)
+    #sine_test(250, 6.11, 3)
     #sine_test(250, 4.32, 3)
-    sine_test(250, 4.57, 3)
+    #sine_test(250, 4.57, 3)
+    pass
 
 
 

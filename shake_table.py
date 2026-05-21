@@ -58,10 +58,10 @@ class ShakeTable():
 
         self.motor = Motor(self.motor_control_pins)
         
-        self.far_sensor = Button(self.sensor_pins[0])
-        self.near_sensor = Button(self.sensor_pins[1])
+        self.far_sensor = Button(self.sensor_pins[0], bounce_time=0.05)
+        self.near_sensor = Button(self.sensor_pins[1], bounce_time=0.05)
 
-
+        print("init_gpio")
         #If the plate reaches the sensors, stop the motor from going further
         self.far_sensor.when_pressed = self.motor.estop
         self.near_sensor.when_pressed = self.motor.estop
@@ -88,6 +88,8 @@ class ShakeTable():
             self.motor.step_away()
             time.sleep(0.0001)
         
+        print("center estop");
+
         self.near_sensor.when_pressed = self.motor.estop
         self.far_sensor.when_pressed = self.motor.estop
 
@@ -114,18 +116,37 @@ class ShakeTable():
         for _ in range(self.tot_steps // 2): # Move to the center position
             self.motor.step_towards()
             time.sleep(0.0001)
-            
+        
+        print("calibrate estop")
+
         self.near_sensor.when_pressed = self.motor.estop
         self.far_sensor.when_pressed = self.motor.estop
 
+
+
+
     def run_trajectory(self, times, amplitudes):
-        direction_array, time_diff_array, _ = discretize_waveform_steps(times, amplitudes)
+        result = discretize_waveform_steps(times, amplitudes)
+        if result is None:
+            return
+       
+        direction_array, time_diff_array, end_time_array = result
+       
+        start_time = time.perf_counter()  # better precision than time.time()
+       
         for i, direction in enumerate(direction_array):
-            time.sleep(time_diff_array[i])
-            if 1 == direction:
+            target_time = end_time_array[i]
+            current_time = time.perf_counter() - start_time
+            wait_time = target_time - current_time
+           
+            if wait_time > 0:
+                time.sleep(wait_time)
+           
+            if direction == 1:
                 self.motor.step_away()
             else:
                 self.motor.step_towards()
+
 
 def test_table_features():
     """
@@ -151,23 +172,24 @@ def test_table_features():
     time.sleep(2)
    
 
-    for _ in range(table.tot_steps):
-        if not table.near_sensor.is_pressed:
-            table.motor.step_towards()
-        else:
-            table.motor.step_away()
-        time.sleep(0.0002)
-
+ #   for _ in range(table.tot_steps):
+ #       if not table.near_sensor.is_pressed:
+ #           table.motor.step_towards()
+ #       else:
+ #           table.motor.step_away()
+ #       time.sleep(0.0002)
+        
 
   
 if __name__ == '__main__':
-#    test_table_features()
+    #test_table_features()
     #Showing natural frequencies
     #sine_test(250, 7.18, 3)
     #sine_test(250, 6.11, 3)
     #sine_test(250, 4.32, 3)
     #sine_test(250, 4.57, 3)
     pass
+
 
 
 
